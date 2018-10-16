@@ -3,22 +3,54 @@ import filecmp
 from dateutil.relativedelta import *
 from datetime import date
 
+#Personal Info
+#Fernando Carretero (fecarret)
+#GitHub: https://github.com/fecarret20/SI206proj1
 
 def getData(file):
 # get a list of dictionary objects from the file
 #Input: file name
 #Ouput: return a list of dictionary objects where
 #the keys are from the first row in the data. and the values are each of the other rows
+	
+	#Open file and skip first row then close it
+	inFile = open(file, 'r')
+	next(inFile)
+	lines = inFile.readlines()
+	inFile.close()
 
-	pass
+	listDict = list()
+
+	#parse the csv for separate key values
+	for line in lines:
+		dataDict = dict()
+		vals = line.split(",")
+		first = vals[0]
+		last = vals[1]
+		email = vals[2]
+		grade = vals[3]
+		dob = vals[4]
+
+		#assign the key values to the key
+		dataDict["First"] = first
+		dataDict["Last"] = last
+		dataDict["Email"] = email
+		dataDict["Year"] = grade
+		dataDict["DOB"] = dob
+
+		#add the dictionary to the list
+		listDict.append(dataDict)
+
+	return listDict
 
 def mySort(data,col):
 # Sort based on key/column
 #Input: list of dictionaries and col (key) to sort on
 #Output: Return the first item in the sorted list as a string of just: firstName lastName
-
-	pass
-
+	#sorts the data based on the key
+	sortedData = sorted(data, key=lambda k: k[col])
+	
+	return sortedData[0]["First"] + " " + sortedData[0]["Last"]
 
 def classSizes(data):
 # Create a histogram
@@ -26,16 +58,65 @@ def classSizes(data):
 # Output: Return a list of tuples sorted by the number of students in that class in
 # descending order
 # [('Senior', 26), ('Junior', 25), ('Freshman', 21), ('Sophomore', 18)]
+	numFreshman = 0
+	numSophomore = 0
+	numJunior = 0
+	numSenior = 0
+	counter = 0
 
-	pass
+	#Calculate frequencies of each year
+	while counter < len(data):
+		if data[counter]["Year"] == "Freshman":
+			numFreshman += 1
 
+		elif data[counter]["Year"] == "Sophomore":
+			numSophomore += 1
+
+		elif data[counter]["Year"] == "Junior":
+			numJunior += 1
+
+		elif data[counter]["Year"] == "Senior":
+			numSenior += 1
+
+		counter += 1
+
+	#Store them as a list of tuples
+	histo = [("Freshman", numFreshman), ("Sophomore", numSophomore), 
+	("Junior", numJunior), ("Senior", numSenior)]
+
+	#sort the list ascending
+	sortedHisto = sorted(histo, key=lambda tup: tup[1], reverse=True)
+
+	return sortedHisto
 
 def findMonth(a):
 # Find the most common birth month form this data
 # Input: list of dictionaries
 # Output: Return the month (1-12) that had the most births in the data
+	dateInfo = list()
 
-	pass
+	counter = 0
+
+	#iterate through the list and get all the months
+	while counter < len(a):
+		vals = a[counter]["DOB"].split("/")
+		month = vals[0]
+
+		dateInfo.append(int(month))
+		counter += 1
+
+	dateInfo.sort(reverse=True)
+	
+	maxCount = 0
+	maxVal = dateInfo[0]
+
+	#determine which month is most frequent in the data
+	for item in dateInfo:
+		if dateInfo.count(item) >= maxCount:
+			maxCount = dateInfo.count(item)
+			maxVal = item
+
+	return maxVal
 
 def mySortPrint(a,col,fileName):
 #Similar to mySort, but instead of returning single
@@ -43,8 +124,15 @@ def mySortPrint(a,col,fileName):
 # as fist,last,email
 #Input: list of dictionaries, col (key) to sort by and output file name
 #Output: No return value, but the file is written
+	outFile = open(fileName, 'w')
+	sortedData = sorted(a, key=lambda k: k[col])
 
-	pass
+	for item in sortedData:
+		line = item["First"] + "," + item["Last"] + "," + item["Email"]
+		outFile.write(line)
+		outFile.write("\n")
+
+	return
 
 def findAge(a):
 # def findAge(a):
@@ -52,9 +140,20 @@ def findAge(a):
 # Output: Return the average age of the students and round that age to the nearest
 # integer.  You will need to work with the DOB and the current date to find the current
 # age in years.
+	dateInfo = list()
 
-	pass
+	counter = 0
 
+	#iterate through the list and get all the years
+	while counter < len(a):
+		vals = a[counter]["DOB"].split("/")
+		year = vals[2]
+		#Calculate the age
+		dateInfo.append(2018 - int(year))
+		counter += 1
+
+	#round the average to the closest integer
+	return int(round(sum(dateInfo) / len(dateInfo)))
 
 ################################################################
 ## DO NOT MODIFY ANY CODE BELOW THIS
